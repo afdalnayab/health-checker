@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<!-- saved from url=(0032)http://127.0.0.1:5500/index.html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Symptom Checker</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+      background-size: cover;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background decoration (e.g., medical icons) */
+    body::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="10" fill="rgba(255,255,255,0.1)"/><path d="M30 70 L70 30 M30 30 L70 70" stroke="rgba(255,255,255,0.2)" stroke-width="2"/></svg>');
+      background-repeat: repeat;
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .container {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 400px;
+      z-index: 1;
+      position: relative;
+      backdrop-filter: blur(5px); /* Optional: glass effect */
+    }
+
+    h1 {
+      font-size: 28px;
+      color: #2c3e50;
+      margin-bottom: 25px;
+      position: relative;
+    }
+
+    h1::before {
+      content: '+';
+      color: #27ae60;
+      font-size: 40px;
+      position: absolute;
+      left: -50px;
+      top: -10px;
+      opacity: 0.7;
+    }
+
+    #symptoms {
+      width: 70%;
+      padding: 12px;
+      margin-right: 10px;
+      border: 2px solid #3498db;
+      border-radius: 25px;
+      font-size: 16px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    #symptoms:focus {
+      border-color: #27ae60;
+    }
+
+    #checkBtn {
+      padding: 12px 25px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    #checkBtn:hover {
+      background-color: #27ae60;
+      transform: scale(1.05);
+    }
+
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: #ecf0f1;
+      color: #2c3e50;
+      font-size: 16px;
+      min-height: 60px;
+      word-wrap: break-word;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Symptom Checker</h1>
+    <input id="symptoms" type="text" placeholder="Enter symptoms">
+    <button id="checkBtn">Check</button>
+    <div id="result">It's crucial to work closely with a doctor to manage diabetes.  **Regularly monitoring and managing your blood sugar levels is the cornerstone of diabetes management.**  This involves following the prescribed medication plan, dietary recommendations, and exercise regimen provided by your healthcare team.  They can provide personalized guidance based on your specific type of diabetes and individual health needs.  Don't hesitate to reach out to them with any questions or concerns you have about managing your diabetes.
+</div>
+  </div>
+
+  <script type="module">
+    import { GoogleGenerativeAI } from "https://cdn.jsdelivr.net/npm/@google/generative-ai/+esm";
+
+    const GEMINI_API_KEY = "AIzaSyCzRzYXZl8AuIVreFIlCtybzuWczOJ42pY"; // Replace with your valid key
+    const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    document.getElementById("checkBtn").addEventListener("click", async () => {
+      const symptoms = document.getElementById("symptoms").value;
+      const resultEl = document.getElementById("result");
+
+      if (!symptoms.trim()) {
+        resultEl.textContent = "Please enter symptoms.";
+        return;
+      }
+
+      resultEl.textContent = "Checking...";
+
+      try {
+        const prompt = `I have the following symptoms: ${symptoms}. Give a basic health suggestion.`;
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = await response.text();
+
+        resultEl.textContent = text;
+      } catch (err) {
+        resultEl.textContent = `Error: ${err.message || "Something went wrong. Try again."}`;
+        console.error("Full error:", err);
+      }
+    });
+  </script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+
+</body></html>
